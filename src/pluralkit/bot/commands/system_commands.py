@@ -140,13 +140,7 @@ async def system_tag(ctx: CommandContext):
 
 async def system_avatar(ctx: CommandContext):
     system = await ctx.ensure_system()
-    new_avatar_url = ctx.remaining() or None
-
-    if new_avatar_url:
-        user = await utils.parse_mention(ctx.client, new_avatar_url)
-        if user:
-            new_avatar_url = user.avatar_url_as(format="png")
-
+    new_avatar_url = await ctx.remaining_as_avatar_image()
     await system.set_avatar(ctx.conn, new_avatar_url)
     await ctx.reply_ok("System avatar {}.".format("updated" if new_avatar_url else "cleared"))
 

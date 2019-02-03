@@ -1,3 +1,4 @@
+import aiohttp
 import asyncio
 from datetime import datetime
 
@@ -151,6 +152,39 @@ class CommandContext:
             return message.content.lower() == confirm_text.lower()
         except asyncio.TimeoutError:
             raise CommandError("Timed out - try again.")
+    
+    async def remaining_as_avatar_image(self):
+        remaining = self.remaining() or None
+        
+        image_url = None
+        # Extract either URL in remaining, @mention, or attachment URL
+        if remaining:
+            user = await utils.parse_mention(self.client, remaining)
+            if user:
+                image_url = user.avatar_url_as(format="png")
+            else:
+                image_url = remaining
+        else:
+            if self.message.attachments:
+                image_url = self.message.attachments[0].proxy_url
+
+        # Connect to the URL and check if it's valid
+        timeout = aiohttp.ClientTimeout(total=5)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.get(image_url) as response:
+                if response.status != 200:
+                    raise CommandError("Image URL returned {} {}, try a different link?".format(response.status, response.reason))
+                if not response.content_type.startswith("image/"):
+                    raise CommandError("URL is not an image. Try using an URL ending in `.png` or `.jpg`.")
+                size = response.headers.get("Content-Length")
+                if not size:
+                    raise CommandError("Server did not return a content size. Try rehosting the image on Imgur?")
+                if size >= 1024*1024:
+                    raise CommandError("This image is too large. The maximum file size for webhook avatars is 1 MB. Try resizing it?")
+                # TODO: is there a width/height image limitation too?
+                image_url = response.url
+
+        return image_url
 
 
 import pluralkit.bot.commands.api_commands

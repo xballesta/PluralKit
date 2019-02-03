@@ -124,13 +124,7 @@ async def member_description(ctx: CommandContext, member: Member):
 
 
 async def member_avatar(ctx: CommandContext, member: Member):
-    new_avatar_url = ctx.remaining() or None
-
-    if new_avatar_url:
-        user = await utils.parse_mention(ctx.client, new_avatar_url)
-        if user:
-            new_avatar_url = user.avatar_url_as(format="png")
-
+    new_avatar_url = await ctx.remaining_as_avatar_image()
     await member.set_avatar(ctx.conn, new_avatar_url)
     await ctx.reply_ok("Member avatar {}.".format("updated" if new_avatar_url else "cleared"))
 
