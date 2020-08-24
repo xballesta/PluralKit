@@ -1,8 +1,9 @@
 import re
-
-import discord
 from io import BytesIO
 from typing import Optional
+
+import aiohttp
+import discord
 
 from pluralkit import db
 from pluralkit.bot import utils, channel_logger
@@ -16,10 +17,12 @@ class ProxyError(Exception):
 
 
 def fix_webhook(webhook: discord.Webhook) -> discord.Webhook:
-    # Workaround for https://github.com/Rapptz/discord.py/issues/1242 and similar issues (#1150)
-    webhook._adapter.store_user = webhook._adapter._store_user
-    webhook._adapter.http = None
     return webhook
+    # Workaround for https://github.com/Rapptz/discord.py/issues/1242 and similar issues (#1150)
+    # webhook._adapter.store_user = webhook._adapter._store_user
+    # webhook._adapter.http = None
+    # return webhook
+
 
 
 async def get_or_create_webhook_for_channel(conn, bot_user: discord.User, channel: discord.TextChannel):
@@ -28,10 +31,11 @@ async def get_or_create_webhook_for_channel(conn, bot_user: discord.User, channe
     if webhook_from_db:
         webhook_id, webhook_token = webhook_from_db
 
-        session = channel._state.http._session
+        session = channel._state.http._HTTPClient__session
+
         hook = discord.Webhook.partial(webhook_id, webhook_token, adapter=discord.AsyncWebhookAdapter(session))
 
-        hook._adapter.store_user = hook._adapter._store_user
+        # hook._adapter.store_user = hook._adapter._store_user
         return fix_webhook(hook)
 
     try:
