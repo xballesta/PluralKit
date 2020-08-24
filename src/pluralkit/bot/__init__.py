@@ -6,6 +6,7 @@ import discord
 import logging
 import os
 import traceback
+import sys
 
 from pluralkit import db
 from pluralkit.bot import commands, proxy, channel_logger, embeds
@@ -119,6 +120,9 @@ def run():
         else:
             # If not, just post the string itself
             embed = None
+
+        if sys.exc_info()[0].__name__ == "MissingPermissions":
+            await message.channel.send(str(sys.exc_info()[1]))
 
         traceback_str = "```python\n{}```".format(traceback.format_exc())
         if len(traceback.format_exc()) >= (2000 - len("```python\n```")):

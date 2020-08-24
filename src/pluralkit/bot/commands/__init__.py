@@ -7,9 +7,10 @@ from typing import Tuple, Optional, Union
 
 from pluralkit import db
 from pluralkit.bot import embeds, utils
-from pluralkit.errors import PluralKitError
+from pluralkit.errors import PluralKitError, PermError
 from pluralkit.member import Member
 from pluralkit.system import System
+from discord.ext import commands
 
 
 def next_arg(arg_string: str) -> Tuple[str, Optional[str]]:
@@ -48,6 +49,15 @@ class CommandContext:
         self.conn = conn
         self.args = args
         self._system = system
+
+    async def has_role(self, role_id: int):
+        if not self.message.guild:
+            return False
+        author: discord.Member = self.message.author
+        for r in author.roles:
+            if r.id == role_id:
+                return True
+        raise PermError(f"Must have role <@&{role_id}> to run this command")
 
     async def get_system(self) -> Optional[System]:
         return self._system

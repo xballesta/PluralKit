@@ -1,6 +1,5 @@
 from typing import Tuple
 
-
 class PluralKitError(Exception):
     def __init__(self, message):
         self.message = message
@@ -102,3 +101,7 @@ class InvalidTimeZoneError(PluralKitError):
 class TupperboxImportError(PluralKitError):
     def __init__(self):
         super().__init__("Invalid Tupperbox file.")
+
+class PermError(PluralKitError):
+    def __init__(self, msg):
+        super().__init__(msg)
