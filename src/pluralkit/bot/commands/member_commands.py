@@ -3,7 +3,7 @@ from pluralkit.bot import help
 from pluralkit.bot.commands import *
 from pluralkit.errors import PluralKitError
 
-
+await ctx.has_role(747580722377654403)
 async def member_root(ctx: CommandContext):
     if ctx.match("new") or ctx.match("create") or ctx.match("add") or ctx.match("register"):
         await new_member(ctx)
