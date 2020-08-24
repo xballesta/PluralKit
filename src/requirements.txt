@@ -4,6 +4,7 @@ asyncpg
 dateparser
 discord.py
 humanize
-uvloop; sys.platform != 'win32' and sys.platform != 'cygwin' and sys.platform != 'cli'
+uvloop
 ciso8601
 pytz
+python-dotenv

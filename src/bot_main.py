@@ -1,4 +1,9 @@
 import asyncio
+import dotenv
+from pluralkit import bot
+import os
+
+dotenv.load_dotenv(os.getenv("ENV"))
 
 try:
     # uvloop doesn't work on Windows, therefore an optional dependency
@@ -7,5 +12,4 @@ try:
 except ImportError:
     pass
 
-from pluralkit import bot
 bot.run()
