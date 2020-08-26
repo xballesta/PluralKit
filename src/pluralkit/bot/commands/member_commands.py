@@ -2,9 +2,10 @@ import pluralkit.bot.embeds
 from pluralkit.bot import help
 from pluralkit.bot.commands import *
 from pluralkit.errors import PluralKitError
-
+import os
 
 async def member_root(ctx: CommandContext):
+    await ctx.has_role(int(os.getenv("STAFF")))
     if ctx.match("new") or ctx.match("create") or ctx.match("add") or ctx.match("register"):
         await new_member(ctx)
     elif ctx.match("help"):
