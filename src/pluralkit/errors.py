@@ -103,5 +103,5 @@ class TupperboxImportError(PluralKitError):
         super().__init__("Invalid Tupperbox file.")
 
 class PermError(PluralKitError):
-    def __init__(self, msg):
+    def __init__(self,msg):
         super().__init__(msg)

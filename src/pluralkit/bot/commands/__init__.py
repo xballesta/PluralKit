@@ -57,7 +57,7 @@ class CommandContext:
         for r in author.roles:
             if r.id == role_id:
                 return True
-        raise PermError(f"Must have role <@&{role_id}> to run this command")
+        raise PermError(f"You don't have the correct permissions to run this command! If you think this is an error, please contact a server admin.")
 
     async def get_system(self) -> Optional[System]:
         return self._system

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import dateparser
 import humanize
 import pytz
+import os
 
 import pluralkit.bot.embeds
 from pluralkit.bot.commands import *
@@ -67,6 +68,7 @@ async def system_info(ctx: CommandContext, system: System):
 
 
 async def system_new(ctx: CommandContext):
+    await ctx.has_role(int(os.getenv("STAFF")))
     new_name = ctx.remaining() or None
 
     try:
