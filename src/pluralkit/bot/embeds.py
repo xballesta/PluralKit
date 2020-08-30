@@ -88,7 +88,7 @@ async def system_card(conn, client: discord.Client, system: System) -> discord.E
 
     account_names = []
     for account_id in await system.get_linked_account_ids(conn):
-        account = await client.get_user_info(account_id)
+        account = await client.get_user(account_id)
         account_names.append("{}#{}".format(account.name, account.discriminator))
 
     card.add_field(name="Linked accounts", value=truncate_field_body("\n".join(account_names)))
@@ -208,7 +208,7 @@ async def get_message_contents(client: discord.Client, channel_id: int, message_
 async def message_card(client: discord.Client, message: db.MessageInfo):
     # Get the original sender of the messages
     try:
-        original_sender = await client.get_user_info(message.sender)
+        original_sender = await client.get_user(message.sender)
     except discord.NotFound:
         # Account was since deleted - rare but we're handling it anyway
         original_sender = None

@@ -29,13 +29,13 @@ async def parse_mention(client: discord.Client, mention: str) -> Optional[discor
     match = re.fullmatch("<@!?(\\d+)>", mention)
     if match:
         try:
-            return await client.get_user_info(int(match.group(1)))
+            return await client.get_user(int(match.group(1)))
         except discord.NotFound:
             return None
 
     # Then try with just ID
     try:
-        return await client.get_user_info(int(mention))
+        return await client.get_user(int(mention))
     except (ValueError, discord.NotFound):
         return None
 
