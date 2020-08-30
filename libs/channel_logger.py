@@ -19,7 +19,7 @@ def embed_set_author_name(embed: discord.Embed, channel_name: str, member_name: 
 
 
 class ChannelLogger:
-    def __init__(self, client: bot.PluralKitBot):
+    def __init__(self, client: bot.pk_bot.PluralKitBot):
         self.logger = logging.getLogger("pluralkit.bot.channel_logger")
         self.client = client
 

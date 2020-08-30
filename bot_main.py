@@ -7,7 +7,7 @@ import traceback
 import discord
 import dotenv
 
-from bot import PluralKitBot
+from bot.pk_bot import PluralKitBot
 from libs import proxy, embeds
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s")
@@ -23,7 +23,12 @@ except ImportError:
     pass
 
 bot = PluralKitBot(command_prefix="pk;")
+ext = [
+    "cogs.api"
+]
 
+for e in ext:
+    bot.load_extension(e)
 
 @bot.event
 async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):

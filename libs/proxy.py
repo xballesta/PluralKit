@@ -200,7 +200,7 @@ async def try_proxy_message(conn, message: discord.Message, logger: ChannelLogge
     return True
 
 
-async def handle_deleted_message(conn, client: bot.PluralKitBot, message_id: int,
+async def handle_deleted_message(conn, client: bot.pk_bot.PluralKitBot, message_id: int,
                                  message_content: Optional[str]) -> bool:
     msg = await db.get_message(conn, message_id)
     if not msg:
@@ -227,7 +227,7 @@ async def handle_deleted_message(conn, client: bot.PluralKitBot, message_id: int
     return True
 
 
-async def try_delete_by_reaction(conn, client: bot.PluralKitBot, message_id: int, reaction_user: int) -> bool:
+async def try_delete_by_reaction(conn, client: bot.pk_bot.PluralKitBot, message_id: int, reaction_user: int) -> bool:
     # Find the message by the given message id or reaction user
     msg = await db.get_message_by_sender_and_id(conn, message_id, reaction_user)
     if not msg:

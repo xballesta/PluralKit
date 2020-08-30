@@ -67,7 +67,7 @@ def exception_log(message_content, author_name, author_discriminator, author_id,
     return embed
 
 
-async def system_card(conn, client: bot.PluralKitBot, system: System) -> discord.Embed:
+async def system_card(conn, client: bot.pk_bot.PluralKitBot, system: System) -> discord.Embed:
     card = discord.Embed()
     card.colour = discord.Colour.blue()
 
@@ -194,7 +194,7 @@ async def front_status(ctx: "CommandContext", switch: Switch) -> discord.Embed:
     return embed
 
 
-async def get_message_contents(client: bot.PluralKitBot, channel_id: int, message_id: int):
+async def get_message_contents(client: bot.pk_bot.PluralKitBot, channel_id: int, message_id: int):
     channel = client.get_channel(channel_id)
     if channel:
         try:
@@ -206,7 +206,7 @@ async def get_message_contents(client: bot.PluralKitBot, channel_id: int, messag
     return None
 
 
-async def message_card(client: bot.PluralKitBot, message: db.MessageInfo):
+async def message_card(client: bot.pk_bot.PluralKitBot, message: db.MessageInfo):
     # Get the original sender of the messages
     try:
         original_sender = await client.get_user_info(message.sender)

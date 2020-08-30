@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bot.classes.member import Member
+from bot.classes.system import System
 from collections import namedtuple
 from datetime import datetime
 import logging
@@ -8,10 +14,9 @@ import asyncpg
 import asyncpg.exceptions
 from discord.utils import snowflake_time
 
-from bot.classes.system import System
-from bot.classes.member import Member
-
 logger = logging.getLogger("pluralkit.db")
+
+
 async def connect(username, password, database, host, port):
     while True:
         try:
@@ -19,6 +24,7 @@ async def connect(username, password, database, host, port):
         except (ConnectionError, asyncpg.exceptions.CannotConnectNowError):
             logger.exception("Failed to connect to database, retrying in 5 seconds...")
             time.sleep(5)
+
 
 def db_wrap(func):
     async def inner(*args, **kwargs):
@@ -31,7 +37,9 @@ def db_wrap(func):
             return res
         except asyncpg.exceptions.PostgresError:
             logger.exception("Error from database query {}".format(func.__name__))
+
     return inner
+
 
 @db_wrap
 async def create_system(conn, system_name: str, system_hid: str) -> System:
@@ -51,7 +59,8 @@ async def remove_system(conn, system_id: int):
 async def create_member(conn, system_id: int, member_name: str, member_hid: str) -> Member:
     logger.debug("Creating member (system={}, name={}, hid={})".format(
         system_id, member_name, member_hid))
-    row = await conn.fetchrow("insert into members (name, system, hid) values ($1, $2, $3) returning *", member_name, system_id, member_hid)
+    row = await conn.fetchrow("insert into members (name, system, hid) values ($1, $2, $3) returning *", member_name,
+                              system_id, member_hid)
     return Member(**row) if row else None
 
 
@@ -82,13 +91,16 @@ async def get_linked_accounts(conn, system_id: int) -> List[int]:
 
 @db_wrap
 async def get_system_by_account(conn, account_id: int) -> System:
-    row = await conn.fetchrow("select systems.* from systems, accounts where accounts.uid = $1 and accounts.system = systems.id", account_id)
+    row = await conn.fetchrow(
+        "select systems.* from systems, accounts where accounts.uid = $1 and accounts.system = systems.id", account_id)
     return System(**row) if row else None
+
 
 @db_wrap
 async def get_system_by_token(conn, token: str) -> Optional[System]:
     row = await conn.fetchrow("select * from systems where token = $1", token)
     return System(**row) if row else None
+
 
 @db_wrap
 async def get_system_by_hid(conn, system_hid: str) -> System:
@@ -104,7 +116,8 @@ async def get_system(conn, system_id: int) -> System:
 
 @db_wrap
 async def get_member_by_name(conn, system_id: int, member_name: str) -> Member:
-    row = await conn.fetchrow("select * from members where system = $1 and lower(name) = lower($2)", system_id, member_name)
+    row = await conn.fetchrow("select * from members where system = $1 and lower(name) = lower($2)", system_id,
+                              member_name)
     return Member(**row) if row else None
 
 
@@ -125,10 +138,12 @@ async def get_member(conn, member_id: int) -> Member:
     row = await conn.fetchrow("select * from members where id = $1", member_id)
     return Member(**row) if row else None
 
+
 @db_wrap
 async def get_members(conn, members: list) -> List[Member]:
     rows = await conn.fetch("select * from members where id = any($1)", members)
     return [Member(**row) for row in rows]
+
 
 @db_wrap
 async def update_system_field(conn, system_id: int, field: str, value):
@@ -149,6 +164,7 @@ async def get_all_members(conn, system_id: int) -> List[Member]:
     rows = await conn.fetch("select * from members where system = $1", system_id)
     return [Member(**row) for row in rows]
 
+
 @db_wrap
 async def get_members_exceeding(conn, system_id: int, length: int) -> List[Member]:
     rows = await conn.fetch("select * from members where system = $1 and length(name) > $2", system_id, length)
@@ -165,19 +181,26 @@ async def get_webhook(conn, channel_id: int) -> (str, str):
 async def add_webhook(conn, channel_id: int, webhook_id: int, webhook_token: str):
     logger.debug("Adding new webhook (channel={}, webhook={}, token={})".format(
         channel_id, webhook_id, webhook_token))
-    await conn.execute("insert into webhooks (channel, webhook, token) values ($1, $2, $3)", channel_id, webhook_id, webhook_token)
+    await conn.execute("insert into webhooks (channel, webhook, token) values ($1, $2, $3)", channel_id, webhook_id,
+                       webhook_token)
+
 
 @db_wrap
 async def delete_webhook(conn, channel_id: int):
     await conn.execute("delete from webhooks where channel = $1", channel_id)
 
+
 @db_wrap
 async def add_message(conn, message_id: int, channel_id: int, member_id: int, sender_id: int):
     logger.debug("Adding new message (id={}, channel={}, member={}, sender={})".format(
         message_id, channel_id, member_id, sender_id))
-    await conn.execute("insert into messages (mid, channel, member, sender) values ($1, $2, $3, $4)", message_id, channel_id, member_id, sender_id)
+    await conn.execute("insert into messages (mid, channel, member, sender) values ($1, $2, $3, $4)", message_id,
+                       channel_id, member_id, sender_id)
 
-class ProxyMember(namedtuple("ProxyMember", ["id", "hid", "prefix", "suffix", "color", "name", "avatar_url", "tag", "system_name", "system_hid"])):
+
+class ProxyMember(namedtuple("ProxyMember",
+                             ["id", "hid", "prefix", "suffix", "color", "name", "avatar_url", "tag", "system_name",
+                              "system_hid"])):
     id: int
     hid: str
     prefix: str
@@ -188,6 +211,7 @@ class ProxyMember(namedtuple("ProxyMember", ["id", "hid", "prefix", "suffix", "c
     tag: str
     system_name: str
     system_hid: str
+
 
 @db_wrap
 async def get_members_by_account(conn, account_id: int) -> List[ProxyMember]:
@@ -203,7 +227,10 @@ async def get_members_by_account(conn, account_id: int) -> List[ProxyMember]:
             and members.system = systems.id""", account_id)
     return [ProxyMember(**row) for row in rows]
 
-class MessageInfo(namedtuple("MemberInfo", ["mid", "channel", "member", "sender", "name", "hid", "avatar_url", "system_name", "system_hid"])):
+
+class MessageInfo(namedtuple("MemberInfo",
+                             ["mid", "channel", "member", "sender", "name", "hid", "avatar_url", "system_name",
+                              "system_hid"])):
     mid: int
     channel: int
     member: int
@@ -223,6 +250,7 @@ class MessageInfo(namedtuple("MemberInfo", ["mid", "channel", "member", "sender"
             "message_sender": str(self.sender),
             "timestamp": snowflake_time(self.mid).isoformat()
         }
+
 
 @db_wrap
 async def get_message_by_sender_and_id(conn, message_id: int, sender_id: int) -> MessageInfo:
@@ -260,9 +288,11 @@ async def delete_message(conn, message_id: int):
     logger.debug("Deleting message (id={})".format(message_id))
     await conn.execute("delete from messages where mid = $1", message_id)
 
+
 @db_wrap
 async def get_member_message_count(conn, member_id: int) -> int:
     return await conn.fetchval("select count(*) from messages where member = $1", member_id)
+
 
 @db_wrap
 async def front_history(conn, system_id: int, count: int):
@@ -278,52 +308,66 @@ async def front_history(conn, system_id: int, count: int):
     order by switches.timestamp desc
     limit $2""", system_id, count)
 
+
 @db_wrap
 async def add_switch(conn, system_id: int):
     logger.debug("Adding switch (system={})".format(system_id))
     res = await conn.fetchrow("insert into switches (system) values ($1) returning *", system_id)
     return res["id"]
 
+
 @db_wrap
 async def move_switch(conn, system_id: int, switch_id: int, new_time: datetime):
     logger.debug("Moving latest switch (system={}, id={}, new_time={})".format(system_id, switch_id, new_time))
-    await conn.execute("update switches set timestamp = $1 where system = $2 and id = $3", new_time, system_id, switch_id)
+    await conn.execute("update switches set timestamp = $1 where system = $2 and id = $3", new_time, system_id,
+                       switch_id)
+
 
 @db_wrap
 async def add_switch_member(conn, switch_id: int, member_id: int):
     logger.debug("Adding switch member (switch={}, member={})".format(switch_id, member_id))
     await conn.execute("insert into switch_members (switch, member) values ($1, $2)", switch_id, member_id)
 
+
 @db_wrap
 async def delete_switch(conn, switch_id: int):
     logger.debug("Deleting switch (id={})".format(switch_id))
     await conn.execute("delete from switches where id = $1", switch_id)
 
+
 @db_wrap
 async def get_server_info(conn, server_id: int):
     return await conn.fetchrow("select * from servers where id = $1", server_id)
+
 
 @db_wrap
 async def update_server(conn, server_id: int, logging_channel_id: int):
     logging_channel_id = logging_channel_id if logging_channel_id else None
     logger.debug("Updating server settings (id={}, log_channel={})".format(server_id, logging_channel_id))
-    await conn.execute("insert into servers (id, log_channel) values ($1, $2) on conflict (id) do update set log_channel = $2", server_id, logging_channel_id)
+    await conn.execute(
+        "insert into servers (id, log_channel) values ($1, $2) on conflict (id) do update set log_channel = $2",
+        server_id, logging_channel_id)
+
 
 @db_wrap
 async def member_count(conn) -> int:
     return await conn.fetchval("select count(*) from members")
 
+
 @db_wrap
 async def system_count(conn) -> int:
     return await conn.fetchval("select count(*) from systems")
+
 
 @db_wrap
 async def message_count(conn) -> int:
     return await conn.fetchval("select count(*) from messages")
 
+
 @db_wrap
 async def account_count(conn) -> int:
     return await conn.fetchval("select count(*) from accounts")
+
 
 async def create_tables(conn):
     await conn.execute("""create table if not exists systems (

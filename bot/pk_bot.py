@@ -9,6 +9,7 @@ import discord
 from discord.ext import commands
 
 from bot import db
+from bot.context import CommandContext
 from libs import channel_logger, proxy
 
 
@@ -86,7 +87,7 @@ class PluralKitBot(commands.Bot):
         if message.author.bot:
             return
         async with self.db.acquire() as conn:
-            ctx: commands.Context = await self.get_context(message, cls=commands.Context)
+            ctx: CommandContext = await self.get_context(message, cls=CommandContext)
             await self.invoke(ctx)
             if not ctx.command:
                 await proxy.try_proxy_message(conn, message, self.logger, self.user)

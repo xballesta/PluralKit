@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bot import Member, Switch
+
 import random
 import re
 import string
@@ -9,8 +15,6 @@ import pytz
 
 from libs import errors
 from bot import db
-from bot.classes.member import Member
-from bot.classes.switch import Switch
 from libs.utils import generate_hid, contains_custom_emoji, validate_avatar_url_or_raise
 
 
