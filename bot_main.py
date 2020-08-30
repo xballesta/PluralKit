@@ -24,7 +24,8 @@ except ImportError:
 
 bot = PluralKitBot(command_prefix="pk;")
 ext = [
-    "cogs.api"
+    "cogs.api",
+    "cogs.member"
 ]
 
 for e in ext:
