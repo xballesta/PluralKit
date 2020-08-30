@@ -1,8 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import bot
+
 import discord
 import logging
 from datetime import datetime
-
-from pluralkit import db
+from bot import db
 
 
 def embed_set_author_name(embed: discord.Embed, channel_name: str, member_name: str, system_name: str, avatar_url: str):
@@ -14,7 +19,7 @@ def embed_set_author_name(embed: discord.Embed, channel_name: str, member_name: 
 
 
 class ChannelLogger:
-    def __init__(self, client: discord.Client):
+    def __init__(self, client: bot.PluralKitBot):
         self.logger = logging.getLogger("pluralkit.bot.channel_logger")
         self.client = client
 

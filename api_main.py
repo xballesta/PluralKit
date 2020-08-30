@@ -4,10 +4,11 @@ import os
 
 from aiohttp import web
 
-from pluralkit import db, utils
-from pluralkit.errors import PluralKitError
-from pluralkit.member import Member
-from pluralkit.system import System
+from libs import utils
+from bot import db
+from libs.errors import PluralKitError
+from bot.classes.member import Member
+from bot.classes.system import System
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s")
 logger = logging.getLogger("pluralkit.api")

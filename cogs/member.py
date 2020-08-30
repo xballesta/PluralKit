@@ -1,7 +1,7 @@
 import pluralkit.bot.embeds
-from pluralkit.bot import help
+from libs import help
 from pluralkit.bot.commands import *
-from pluralkit.errors import PluralKitError
+from libs.errors import PluralKitError
 import os
 
 async def member_root(ctx: CommandContext):

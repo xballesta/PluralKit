@@ -4,14 +4,14 @@ import string
 from collections.__init__ import namedtuple
 from datetime import datetime
 from typing import Optional, List, Tuple
-import os
 
 import pytz
 
-from pluralkit import db, errors
-from pluralkit.member import Member
-from pluralkit.switch import Switch
-from pluralkit.utils import generate_hid, contains_custom_emoji, validate_avatar_url_or_raise
+from libs import errors
+from bot import db
+from bot.classes.member import Member
+from bot.classes.switch import Switch
+from libs.utils import generate_hid, contains_custom_emoji, validate_avatar_url_or_raise
 
 
 def canonicalize_tz_name(name: str) -> Optional[str]:

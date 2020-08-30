@@ -1,11 +1,6 @@
-import aiohttp
-import asyncio
 import io
 import json
-import os
-from datetime import datetime
 
-from pluralkit.errors import TupperboxImportError
 from pluralkit.bot.commands import *
 
 async def import_root(ctx: CommandContext):

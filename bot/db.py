@@ -8,8 +8,8 @@ import asyncpg
 import asyncpg.exceptions
 from discord.utils import snowflake_time
 
-from pluralkit.system import System
-from pluralkit.member import Member
+from bot.classes.system import System
+from bot.classes.member import Member
 
 logger = logging.getLogger("pluralkit.db")
 async def connect(username, password, database, host, port):

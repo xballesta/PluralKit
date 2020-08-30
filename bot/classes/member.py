@@ -4,8 +4,9 @@ from datetime import date, datetime
 from collections.__init__ import namedtuple
 from typing import Optional, Union
 
-from pluralkit import db, errors
-from pluralkit.utils import validate_avatar_url_or_raise, contains_custom_emoji
+from libs import errors
+from bot import db
+from libs.utils import validate_avatar_url_or_raise, contains_custom_emoji
 
 
 class Member(namedtuple("Member",

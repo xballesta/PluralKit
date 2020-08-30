@@ -5,12 +5,11 @@ import discord
 import re
 from typing import Tuple, Optional, Union
 
-from pluralkit import db
-from pluralkit.bot import embeds, utils
-from pluralkit.errors import PluralKitError, PermError
-from pluralkit.member import Member
-from pluralkit.system import System
-from discord.ext import commands
+
+from libs import utils
+from libs.errors import PluralKitError, PermError
+from bot.classes.member import Member
+from bot.classes.system import System
 
 
 def next_arg(arg_string: str) -> Tuple[str, Optional[str]]:
@@ -43,7 +42,7 @@ class CommandError(Exception):
 
 
 class CommandContext:
-    def __init__(self, client: discord.Client, message: discord.Message, conn, args: str, system: Optional[System]):
+    def __init__(self, client: bot.PluralKitBot, message: discord.Message, conn, args: str, system: Optional[System]):
         self.client = client
         self.message = message
         self.conn = conn
@@ -166,75 +165,3 @@ class CommandContext:
         except asyncio.TimeoutError:
             raise CommandError("Timed out - try again.")
 
-
-import pluralkit.bot.commands.api_commands
-import pluralkit.bot.commands.import_commands
-import pluralkit.bot.commands.member_commands
-import pluralkit.bot.commands.message_commands
-import pluralkit.bot.commands.misc_commands
-import pluralkit.bot.commands.mod_commands
-import pluralkit.bot.commands.switch_commands
-import pluralkit.bot.commands.system_commands
-
-
-async def command_root(ctx: CommandContext):
-    if ctx.match("system"):
-        await system_commands.system_root(ctx)
-    elif ctx.match("member"):
-        await member_commands.member_root(ctx)
-    elif ctx.match("link"):
-        await system_commands.account_link(ctx)
-    elif ctx.match("unlink"):
-        await system_commands.account_unlink(ctx)
-    elif ctx.match("message"):
-        await message_commands.message_info(ctx)
-    elif ctx.match("log"):
-        await mod_commands.set_log(ctx)
-    elif ctx.match("invite"):
-        await misc_commands.invite_link(ctx)
-    elif ctx.match("export"):
-        await misc_commands.export(ctx)
-    elif ctx.match("switch"):
-        await switch_commands.switch_root(ctx)
-    elif ctx.match("token"):
-        await api_commands.token_root(ctx)
-    elif ctx.match("import"):
-        await import_commands.import_root(ctx)
-    elif ctx.match("help"):
-        await misc_commands.help_root(ctx)
-    elif ctx.match("tell"):
-        await misc_commands.tell(ctx)
-    else:
-        raise CommandError("Unknown command {}. For a list of commands, type `pk;help commands`.".format(ctx.pop_str()))
-
-
-async def run_command(ctx: CommandContext, func):
-    # lol nested try
-    try:
-        try:
-            await func(ctx)
-        except PluralKitError as e:
-            raise CommandError(e.message, e.help_page)
-    except CommandError as e:
-        content, embed = e.format()
-        await ctx.reply(content=content, embed=embed)
-
-
-async def command_dispatch(client: discord.Client, message: discord.Message, conn) -> bool:
-    prefix = "^(pk(;|!)|<@{}> )".format(client.user.id)
-    regex = re.compile(prefix, re.IGNORECASE)
-
-    cmd = message.content
-    match = regex.match(cmd)
-    if match:
-        remaining_string = cmd[match.span()[1]:].strip()
-        ctx = CommandContext(
-            client=client,
-            message=message,
-            conn=conn,
-            args=remaining_string,
-            system=await System.get_by_account(conn, message.author.id)
-        )
-        await run_command(ctx, command_root)
-        return True
-    return False

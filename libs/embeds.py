@@ -2,12 +2,13 @@ import discord
 import humanize
 from typing import Tuple
 
-from pluralkit import db
-from pluralkit.bot.utils import escape
-from pluralkit.member import Member
-from pluralkit.switch import Switch
-from pluralkit.system import System
-from pluralkit.utils import get_fronters, display_relative
+import bot
+from bot import db
+from libs.utils import escape
+from bot.classes.member import Member
+from bot.classes.switch import Switch
+from bot.classes.system import System
+from libs.utils import get_fronters, display_relative
 
 
 def truncate_field_name(s: str) -> str:
@@ -66,7 +67,7 @@ def exception_log(message_content, author_name, author_discriminator, author_id,
     return embed
 
 
-async def system_card(conn, client: discord.Client, system: System) -> discord.Embed:
+async def system_card(conn, client: bot.PluralKitBot, system: System) -> discord.Embed:
     card = discord.Embed()
     card.colour = discord.Colour.blue()
 
@@ -193,7 +194,7 @@ async def front_status(ctx: "CommandContext", switch: Switch) -> discord.Embed:
     return embed
 
 
-async def get_message_contents(client: discord.Client, channel_id: int, message_id: int):
+async def get_message_contents(client: bot.PluralKitBot, channel_id: int, message_id: int):
     channel = client.get_channel(channel_id)
     if channel:
         try:
@@ -205,7 +206,7 @@ async def get_message_contents(client: discord.Client, channel_id: int, message_
     return None
 
 
-async def message_card(client: discord.Client, message: db.MessageInfo):
+async def message_card(client: bot.PluralKitBot, message: db.MessageInfo):
     # Get the original sender of the messages
     try:
         original_sender = await client.get_user_info(message.sender)

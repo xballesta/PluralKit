@@ -1,15 +1,20 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import bot
+
 import re
 from io import BytesIO
 from typing import Optional
 
-import aiohttp
 import discord
 
-from pluralkit import db
-from pluralkit.bot import utils, channel_logger
-from pluralkit.bot.channel_logger import ChannelLogger
-from pluralkit.member import Member
-from pluralkit.system import System
+from bot import db
+from libs import utils
+from libs.channel_logger import ChannelLogger
+from bot.classes.member import Member
+from bot.classes.system import System
 
 
 class ProxyError(Exception):
@@ -195,8 +200,8 @@ async def try_proxy_message(conn, message: discord.Message, logger: ChannelLogge
     return True
 
 
-async def handle_deleted_message(conn, client: discord.Client, message_id: int,
-                                 message_content: Optional[str], logger: channel_logger.ChannelLogger) -> bool:
+async def handle_deleted_message(conn, client: bot.PluralKitBot, message_id: int,
+                                 message_content: Optional[str]) -> bool:
     msg = await db.get_message(conn, message_id)
     if not msg:
         return False
@@ -207,7 +212,7 @@ async def handle_deleted_message(conn, client: discord.Client, message_id: int,
         return False
 
     await db.delete_message(conn, message_id)
-    await logger.log_message_deleted(
+    await client.logger.log_message_deleted(
         conn,
         channel.guild.id,
         channel.name,
@@ -222,8 +227,7 @@ async def handle_deleted_message(conn, client: discord.Client, message_id: int,
     return True
 
 
-async def try_delete_by_reaction(conn, client: discord.Client, message_id: int, reaction_user: int,
-                                 logger: channel_logger.ChannelLogger) -> bool:
+async def try_delete_by_reaction(conn, client: bot.PluralKitBot, message_id: int, reaction_user: int) -> bool:
     # Find the message by the given message id or reaction user
     msg = await db.get_message_by_sender_and_id(conn, message_id, reaction_user)
     if not msg:
@@ -240,4 +244,4 @@ async def try_delete_by_reaction(conn, client: discord.Client, message_id: int, 
     # Then delete the original message
     await original_message.delete()
 
-    await handle_deleted_message(conn, client, message_id, original_message.content, logger)
+    await handle_deleted_message(conn, client, message_id, original_message.content)

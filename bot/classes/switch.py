@@ -2,8 +2,8 @@ from collections import namedtuple
 from datetime import datetime
 from typing import List
 
-from pluralkit import db
-from pluralkit.member import Member
+from bot import db
+from bot.classes.member import Member
 
 
 class Switch(namedtuple("Switch", ["id", "system", "timestamp", "members"])):

@@ -3,7 +3,7 @@ import json
 import os
 from discord.utils import oauth_url
 
-from pluralkit.bot import help
+from libs import help
 from pluralkit.bot.commands import *
 from pluralkit.bot.embeds import help_footer_embed
 
